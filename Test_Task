@@ -1,0 +1,47 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('cPanel Store Automation', () => {
+  test('Navigate to cPanel store and verify product order process', async ({ page }) => {
+    // Step 1: Go to the cPanel store
+    await page.goto('https://store.cpanel.net/cart');
+
+    // Step 2: Order a Product
+    await page.click('text=Order Now'); // 'Order Now' button text
+
+    // Step 3: Enter IP Address
+    await page.fill('input[name="ipAddress"]', '2.2.2.2');
+
+    // Step 4: Select Addons
+    await page.check('input[name="addon1"]'); // Replace 'addon1' with actual addon name
+
+    // Step 5: Continue to Checkout
+    await expect(page.locator('text=Order Summary')).toBeVisible();
+    await page.click('text=Continue'); // Adjust selector based on actual 'Continue' button text
+
+    // Step 6: Verify Product and Price in Step 2 Review & Checkout
+    await expect(page.locator('text=Review & Checkout')).toBeVisible();
+    await expect(page.locator('text=Expected Product Name')).toBeVisible(); // Replace with actual product name
+    await expect(page.locator('text=Expected Addon Name')).toBeVisible(); // Replace with actual addon name
+    await expect(page.locator('text=$Expected Price')).toBeVisible(); // Replace with actual price
+
+    // Step 7: Proceed to Checkout
+    await page.click('text=Checkout'); // Adjust selector based on actual 'Checkout' button text
+
+    // Step 8: Verify Checkout Information
+    await expect(page.locator('text=Product Name')).toBeVisible(); // Replace with actual product name
+    await expect(page.locator('text=2.2.2.2')).toBeVisible(); // Verify IP Address
+    await expect(page.locator('text=$Expected Monthly Price')).toBeVisible(); // Replace with actual monthly price
+
+    // Verify presence of all required sections
+    await expect(page.locator('text=Personal Information')).toBeVisible();
+    await expect(page.locator('text=Billing Address')).toBeVisible();
+    await expect(page.locator('text=Account Security')).toBeVisible();
+    await expect(page.locator('text=Terms & Conditions')).toBeVisible();
+    await expect(page.locator('text=Payment Details')).toBeVisible();
+
+    // Verify 'Complete Order' button is visible but disabled
+    const completeOrderButton = page.locator('text=Complete Order');
+    await expect(completeOrderButton).toBeVisible();
+    await expect(completeOrderButton).toBeDisabled();
+  });
+});
